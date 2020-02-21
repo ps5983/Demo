@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring https://mybatis.org/schema/mybatis-spring.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<!-- 컨트롤러를 제외한 서비스 dao mapper 등은 다 여기 담당 exclude ->controller했기 때문에 -->
+	<context:component-scan
+		base-package="com.example.demo">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- datasource 설정 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+	<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+	<property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"></property>
+	<property name="username" value="sit"></property>
+	<property name="password" value="oracle"></property>
+
+	</bean>
+	
+	<!-- MyBatis 설정 --><!-- ref는 이 안 클래스들을 레퍼런스로 사용한단소리고 value는 url일경우 (텍스트) -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations" value="classpath:mappers/*Mapper.xml"></property>
+	</bean>
+	<!-- 객체 넘길때는 ref로 넘김 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"/>
+	</bean>
+	
+	<mybatis-spring:scan base-package = "com.example.demo" annotation="org.apache.ibatis.annotations.Mapper"/>
+	
+	
+	<!-- Transaction AOP설정 -->
+	
+	<bean id = "transactionManager"  
+	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+		<!-- <tx:method name="get*" read-only="true"/> -->
+	<!-- 	<tx:method name="insert" rollback-for="Exception"> -->
+		<tx:method name="*" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>	
+	
+	<aop:config>
+	<aop:pointcut expression="execution(public * com.example.demo..*Service.*(..))" 
+	id="servicePointCut"/>
+	
+	<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointCut"/>
+	</aop:config>
+	
+	
+</beans>

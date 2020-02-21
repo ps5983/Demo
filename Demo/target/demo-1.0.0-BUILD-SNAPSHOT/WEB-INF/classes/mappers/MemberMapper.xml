@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.example.demo.member.service.impl.MemberMapper"><!-- 마이바티스는네이스페이스 필수이고 namespace는 MemberMapper.java파일 이름 꼭 따야함 -->
+	<!-- vo로 리설트 타입 설정 vo에 담을거기때문에 -->
+	<select id="selectMemberList"
+		resultType="com.example.demo.member.service.MemberVO">
+		SELECT
+		mem_id,
+		mem_name,
+		mem_pwd,
+		mem_phone,
+		mem_email,
+		reg_date,
+		reg_user,
+		upd_date,
+		upd_user
+		FROM
+		tb_member
+		ORDER BY reg_date desc
+
+	</select>
+
+
+	<!-- id를 넘겨서 받아야하기때문에 파라미터타입으로 STring으로 받아오고 너ㅓㅁ겨주는 역할
+	스트링도 소문자인게 alias가 적용되어있기 때문에 소문자로 mapper에서는 소문자로  -->
+	<select id="selectMember" parameterType="string"
+		resultType="MEMBER">
+		SELECT
+		mem_id,
+		mem_name,
+		mem_pwd,
+		mem_phone,
+		mem_email,
+		reg_date,
+		reg_user,
+		upd_date,
+		upd_user
+		FROM
+		tb_member
+		WHERE mem_id = #{mem_id}
+	</select>
+
+	<insert id="insertMember" parameterType="Member">
+
+		INSERT INTO tb_member (
+		mem_id,
+		mem_name,
+		mem_pwd,
+		mem_phone,
+		mem_email,
+		reg_date,
+		reg_user,
+		upd_date,
+		upd_user
+		) VALUES (
+		#{mem_id},
+		#{mem_name},
+		#{mem_pwd},
+		#{mem_phone},
+		#{mem_email},
+		SYSDATE,
+		#{reg_user}
+		)
+
+	</insert>
+
+	<update id="updateMember" parameterType="Member">
+		UPDATE tb_member
+		SET
+		mem_name=#{mem_name}
+		, mem_pwd=#{mem_pwd}
+		, mem_phone=#{mem_phone}
+		, mem_email=#{mem_email}
+		, upd_date=SYSDATE
+		, upd_user=#{upd_user}
+		WHERE meem_id = #{mem_id}
+
+	</update>
+
+	<delete id="deleteMember" parameterType="string">
+	DELETE FROM tb_member WHERE mem_id = #{mem_id}
+	</delete>
+
+
+</mapper>

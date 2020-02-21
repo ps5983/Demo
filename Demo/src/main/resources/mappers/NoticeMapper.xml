@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper 
+namespace="com.example.demo.notice.service.impl.NoticeMapper">
+
+	<select id="selectNoticeList"
+		resultType="com.example.demo.notice.service.Notice">
+		SELECT
+		bo_seq_no,
+		bo_type,
+		bo_title,
+		bo_writer,
+		bo_hit_cnt,
+		bo_del_yn
+		FROM
+		tb_board
+		ORDER BY bo_seq_no ASC
+	</select>
+
+	<select id="selectNotice" parameterType="String" resultType="notice">
+	
+	SELECT
+    bo_seq_no,
+    bo_type,
+    bo_title,
+    bo_content,
+    bo_writer,
+    bo_hit_cnt
+FROM
+    tb_board
+WHERE bo_seq_no = #{bo_seq_no}
+	</select>
+
+<insert id="insertNotice" parameterType="Notice">
+
+INSERT INTO tb_board (
+    bo_seq_no,
+    bo_type,
+    bo_title,
+    bo_content,
+    bo_writer,
+    bo_hit_cnt,
+    bo_del_yn,
+    reg_date,
+    reg_user,
+) VALUES(
+ #{bo_seq_no},
+ #{bo_type},
+ #{bo_title},
+ #{bo_content},
+ #{bo_writer},
+ #{bo_hit_cnt},
+ #{bo_del_yn},
+ #{reg_date},
+ #{reg_user}
+)
+</insert>
+
+
+
+</mapper>

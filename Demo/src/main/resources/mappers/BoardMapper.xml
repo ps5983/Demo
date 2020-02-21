@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper 
+	namespace="com.example.demo.board.service.impl.BoardMapper">
+
+<select id="selectTotalCount" resultType="int" parameterType="map">
+
+	SELECT
+		count(*) as cnt
+	FROM
+		tb_board a, tb_member b
+	WHERE a.bo_writer = b.mem_id
+	AND a.bo_del_yn = 'N'
+	
+	<if test="searchWord != null and searchWord !=''">
+		<if test="searchType == '1'">
+		AND a.bo_title LIKE '%' || #{searchWord} || '%'
+		</if>
+		<if test="searchType == '2'">
+		AND a.bo_content LIKE '%' || #{searchWord} || '%'
+		</if>
+		<if test="searchType == '3'">
+		AND (a.bo_title LIKE '%' || #{searchWord} || '%' <!-- 반드시 괄호 들어가야함 -->
+		OR a.bo_content LIKE '%' || #{searchWord} || '%')
+		
+		</if>
+		<if test="searchType == '4'">
+		AND b.mem_name LIKE '%' || #{searchWord} || '%'
+		</if>
+	</if>
+	
+	ORDER BY a.reg_date DESC
+
+
+
+</select>
+
+<select id="selectBoardList" resultType="Board" parameterType="map">
+	<include refid="CommonMapper.pageHeader"></include>
+
+	SELECT
+		  a.bo_seq_no 
+		, a.bo_type 
+		, a.bo_title
+		, a.bo_content
+		, a.bo_writer 
+		, b.mem_name as bo_writer_name
+		, a.bo_hit_cnt 
+		, a.bo_del_yn 
+		, a.reg_date 
+		, a.reg_user 
+		, a.upd_date 
+		, a.upd_user
+	FROM
+		tb_board a, tb_member b
+	WHERE a.bo_writer = b.mem_id
+	AND a.bo_del_yn = 'N'
+	
+		<if test="searchWord != null and searchWord !=''">
+		<if test="searchType == '1'">
+		AND a.bo_title LIKE '%' || #{searchWord} || '%'
+		</if>
+		<if test="searchType == '2'">
+		AND a.bo_content LIKE '%' || #{searchWord} || '%'
+		</if>
+		<if test="searchType == '3'">
+		AND (a.bo_title LIKE '%' || #{searchWord} || '%' <!-- 반드시 괄호 들어가야함 -->
+		OR a.bo_content LIKE '%' || #{searchWord} || '%')
+		
+		</if>
+		<if test="searchType == '4'">
+		AND b.mem_name LIKE '%' || #{searchWord} || '%'
+		</if>
+	</if>
+	
+	ORDER BY a.reg_date DESC
+	
+	<include refid="CommonMapper.pageFooter"></include>
+</select>
+<select id="selectBoard" resultType="Board" parameterType="int">
+	SELECT
+		  a.bo_seq_no 
+		, a.bo_type 
+		, a.bo_title
+		, a.bo_content
+		, a.bo_writer 
+		
+		, (SELETE b.mem_name 
+		FROM tb_member b 
+		WHERE a.bo_writer = b.mem_id) 
+		as bo_writer_name
+		
+		, a.bo_hit_cnt 
+		, a.bo_del_yn 
+		, a.reg_date 
+		, a.reg_user 
+		, a.upd_date 
+		, a.upd_user
+	FROM
+		tb_board a
+	WHERE bo_seq_no = #{bo_seq_no}
+	ORDER BY a.reg_date DESC
+
+</select>
+
+<insert id="insertBoard" parameterType="Board">
+	INSERT INTO tb_board(
+		 bo_seq_no 
+		,bo_type 
+		,bo_title
+		,bo_content
+		,bo_writer 
+		,bo_hit_cnt 
+		,bo_del_yn 
+		,reg_date 
+		,reg_user 
+	)VALUES(
+		 SEQ_BO_SEQ_NO.NEXTVAL
+		,'BBQ'
+		,#{bo_title}
+		,#{bo_content}
+		,#{bo_writer}
+		,0 
+		,'N'
+		,SYSDATE
+		,#{reg_user}
+	)
+</insert>
+<update id="updateBoard" parameterType="Board">
+	UPDATE tb_board
+	SET
+		bo_title  = #{bo_title},
+		bo_content  = #{bo_content},
+		upd_date   = SYSDATE,
+		upd_user  = #{upd_user}
+		
+		WHERE bo_seq_no   = #{bo_seq_no}
+
+
+</update>
+<update id="updateHitCnt" parameterType="int">
+	UPDATE tb_board
+	SET
+		bo_hit_cnt = bo_hit_cnt +1
+	WHERE bo_seq_no   = #{bo_seq_no}
+</update>
+<delete id="deleteBoard" parameterType="int">
+	UPDATE tb_board
+	SET
+		bo_del_yn = 'Y'
+	WHERE bo_seq_no   = #{bo_seq_no}
+
+</delete>
+
+<!-- 
+public in
+t selectTotalCount()throws Exception;
+	
+	public List<Board> selectBoardList()throws Exception;
+	
+	public Board selectBoard()throws Exception;
+	
+	public int insertBoard(Board board)throws Exception;
+	
+	public int updateBoard(Board board)throws Exception;
+
+	public int deleteBoard(int bo_seq_no)throws Exception;
+	
+	public int updateHitCnt(int bo_seq_noboard)throws Exception;
+} -->
+</mapper>

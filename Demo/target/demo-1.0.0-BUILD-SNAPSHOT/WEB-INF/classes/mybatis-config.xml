@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  mybatis 홈페이지==> 시작하기에 있는 config파일  복사 -->
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- 매퍼파일에 리설트타입 경로가 너무 길어서 aliases로 줄여서 사룡하기 위해서 -->
+	<typeAliases>
+	<typeAlias type="com.example.demo.member.service.MemberVO" alias="MEMBER"/>
+	</typeAliases>
+	
+</configuration>
+
